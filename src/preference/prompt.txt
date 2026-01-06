@@ -1,0 +1,83 @@
+<system>
+Your goal is to generate a single, "Gold Standard" assistant response by synthesizing the original response with the user's subsequent feedback to create a perfect first-turn answer.
+</system>
+
+<context>
+Analyze the multi-turn conversation. Your task is to rewrite the assistant's first response so it incorporates the feedback turn as if the assistant knew the intent from the start.
+
+**Guiding Principles:**
+- **Synthesis:** Do not just address the feedback; merge it into the original response. If the original prompt asked for 10 items and the feedback corrects 1, the improved response must still contain all 10 items with the 1 correction integrated.
+- **Naturalism:** The response must read like a first-attempt answer. No apologies, no acknowledgment of mistakes, and no "As you mentioned."
+- **Integrity:** Only use information from the provided history. Do not invent new facts.
+- **Filtering (No Change):** If the user feedback is nonsensical, irrelevant, or doesn't actually result in a better response than the original, you must output an empty string for the result.
+</context>
+
+<feedback>
+**correction**: Fact-check and update the response based on the user's signal.
+- Replace the specific error while preserving all other correct information.
+- Write as if the information was accurate from the beginning.
+
+**request**: Apply the requested format, style, or additional details.
+- If the user asks for a format change (e.g., "make it a list"), apply it to the entire original content.
+- If the user asks for more detail on a specific part, expand that part without deleting the rest.
+</feedback>
+
+<output_format>
+Output exactly one valid JSON object per turn with no additional text. If no improvement is necessary or valid, return an empty string value.
+
+{"improved_response": "<integrated_gold_standard_response_OR_empty_string>"}
+</output_format>
+
+<input>
+[
+  ... conversation history ...
+  {"role": "assistant", "content": "<original_response>"},
+  {"role": "user", "content": "<feedback_signal>"},
+  "<predicted_dialog_act>"
+]
+</input>
+
+<example>
+<scenario>Synthesis (Integrating Correction while preserving scope)</scenario>
+<input>
+[
+  {"role": "user", "content": "List the capital of France and Japan."},
+  {"role": "assistant", "content": "The capital of France is Lyon and the capital of Japan is Tokyo."},
+  {"role": "user", "content": "Actually, the capital of France is Paris."},
+  "correction"
+]
+</input>
+<output>
+{"improved_response": "The capital of France is Paris and the capital of Japan is Tokyo."}
+</output>
+</example>
+
+<example>
+<scenario>Filtering (Feedback doesn't improve the response)</scenario>
+<input>
+[
+  {"role": "user", "content": "Tell me a joke about a cat."},
+  {"role": "assistant", "content": "Why was the cat sitting on the computer? To keep an eye on the mouse!"},
+  {"role": "user", "content": "Tell me a better one."},
+  "request"
+]
+</input>
+<output>
+{"improved_response": ""}
+</output>
+</example>
+
+<example>
+<scenario>Request (Formatting + Information Preservation)</scenario>
+<input>
+[
+  {"role": "user", "content": "What are the colors of the rainbow?"},
+  {"role": "assistant", "content": "The colors are red, orange, yellow, green, blue, indigo, and violet."},
+  {"role": "user", "content": "Put them in a bulleted list."},
+  "request"
+]
+</input>
+<output>
+{"improved_response": "The colors of the rainbow are:\n* Red\n* Orange\n* Yellow\n* Green\n* Blue\n* Indigo\n* Violet"}
+</output>
+</example>

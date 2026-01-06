@@ -1,0 +1,5 @@
+.env
+.venv
+analysis
+local
+__pycache__/

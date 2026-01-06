@@ -1,0 +1,7 @@
+datasets
+tqdm
+python-dotenv
+openai
+spacy
+scikit-learn
+matplotlib
